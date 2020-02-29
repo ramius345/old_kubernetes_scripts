@@ -1,0 +1,17 @@
+[Unit]
+Description=etcd keyvalue store
+After=docker.service
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=/usr/bin/docker run --name etcd -v /home/ramius/kubernetes/etcd/ssl:/etc/ssl/certs --net=host -v /home/ramius/kubernetes/etcd/data:/etcd-data -p 4001:4001 -p 2380:2380 -p 2379:2379 gcr.io/etcd-development/etcd:v3.2.9 /usr/local/bin/etcd --name greengrape --data-dir /etcd-data --initial-advertise-peer-urls https://0.0.0.0:2380 --listen-peer-urls https://0.0.0.0:2380 --listen-client-urls https://0.0.0.0:2379 --advertise-client-urls=https://greengrape.pineapple.no-ip.biz:2379 --cert-file /etc/ssl/certs/etcd.cert.pem --key-file /etc/ssl/certs/etcd.key.pem --trusted-ca-file /etc/ssl/certs/etcd.ca.pem --peer-auto-tls
+
+
+ExecStop=/bin/bash -c "/usr/bin/docker rm -fv etcd || true"
+SuccessExitStatus=137 SIGKILL
+
+[Install]
+WantedBy=multi-user.target
+
+
